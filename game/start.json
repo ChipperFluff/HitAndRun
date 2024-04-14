@@ -1,0 +1,18 @@
+{
+    "page": {
+        "title": "test",
+        "description": "hahahahaha"
+    },
+    "options": {
+        "1": {
+            "text": "Human",
+            "points": 50,
+            "next": "start.json"
+        },
+        "2": {
+            "text": "Animal",
+            "points": 10,
+            "next": "start.json"
+        }
+    }
+}

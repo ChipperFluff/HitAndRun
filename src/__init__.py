@@ -1,48 +1,62 @@
 from flask import Flask, render_template, url_for, request, redirect
 import configparser
-import os
+import json
+from pathlib import Path
+
+# Assuming logger.py is properly structured as a module
 from .logger import debug, info
 
 app = Flask(__name__)
 
-def load_config(config_file:str):
+def load_config(config_file: Path):
     info("Loading config...")
-    debug("create logger parser")
+    debug("Creating config parser")
     config = configparser.ConfigParser()
-    debug(f"loading config from: {config_file}")
+    debug(f"Loading config from: {config_file}")
+    
     if not config.read(config_file):
         raise FileNotFoundError(f"Unable to find {config_file}")
     
-    connection_config = 'connection'
-    if connection_config not in config:
-        raise KeyError(f"Section {connection_config} not found in the {config_file}")
+    section = 'connection'
+    if section not in config:
+        raise KeyError(f"Section {section} not found in the {config_file}")
 
-    host = config[connection_config].get('host', '127.0.0.1')  # Default to localhost
-    port = config[connection_config].getint('port', 5000)      # Default to port 5000
-    debug_mode = config[connection_config].getboolean('debug', False)  # Default to False
+    host = config[section].get('host', '127.0.0.1')
+    port = config[section].getint('port', 5000)
+    debug_mode = config[section].getboolean('debug', False)
 
     return host, port, debug_mode
 
-def render_menue(title:str, description:str, options:list):
-    return render_template('index.html', baseURL=url_for("option"),
+def render_menu(title: str, description: str, options: list):
+    return render_template('index.html', baseURL=url_for("index"),
                            page={"title": title, "description": description},
                            options=options)
 
+def load_menu(file: Path):
+    debug(f"Loading menu from: {file}")
+    if not file.is_file():
+        raise FileNotFoundError(f"Unable to find {file}")
+
+    with file.open("r") as menu_file:
+        menu = json.load(menu_file)
+    
+    options = [{"id": f"{option['next']}:{id}", "text": option['text']}
+               for id, option in menu['options'].items()]
+    
+    return render_menu(menu["page"]["title"], menu["page"]["description"], options)
+
 @app.route("/")
 def index():
-    return render_menue("HitAndPlay", "a fun game",                         
-                        options=[{"id": 100, "text": "Play"},
-                                {"id": 100, "text": "About"},
-                                {"id": 100, "text": "Leaderboard"}])
+    info("Rendering index menu...")
+    return load_menu(Path("game/start.json"))
 
 @app.route("/option")
 def option():
-    return redirect(url_for("/"))
+    info("Redirecting to index...")
+    return redirect(url_for("index"))
 
 def run():
     info("Starting app...")
-    host, port, debug_mode = load_config('config.ini')
+    config_path = Path('config.ini')
+    host, port, debug_mode = load_config(config_path)
     app.run(host=host, port=port, debug=debug_mode)
-
-if __name__ == '__main__':
-    run()
