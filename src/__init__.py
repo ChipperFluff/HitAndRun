@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for, request, redirect
 import configparser
 import os
 from .logger import debug, info
@@ -23,9 +23,21 @@ def load_config(config_file:str):
 
     return host, port, debug_mode
 
+def render_menue(title:str, description:str, options:list):
+    return render_template('index.html', baseURL=url_for("option"),
+                           page={"title": title, "description": description},
+                           options=options)
+
 @app.route("/")
 def index():
-    return render_template('index.html')
+    return render_menue("HitAndPlay", "a fun game",                         
+                        options=[{"id": 100, "text": "Play"},
+                                {"id": 100, "text": "About"},
+                                {"id": 100, "text": "Leaderboard"}])
+
+@app.route("/option")
+def option():
+    return redirect(url_for("/"))
 
 def run():
     info("Starting app...")

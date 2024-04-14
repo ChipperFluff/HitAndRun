@@ -3,16 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <title>Mobile-Friendly Site</title>
+    <title>Mobile Option Selector</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+        }
+        
+        .header {
+            padding-bottom: 20px;
+        }
+        
+        .title {
+            font-size: 28px; /* Large and readable */
+            color: #8B4513; /* Squirrel brown */
+        }
+        
+        .description {
+            font-size: 16px;
+            color: #A9A9A9; /* Grey for a subtle look */
+            margin-bottom: 30px; /* Spacing before options */
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr; /* One column grid */
+            gap: 20px; /* Space between options */
+        }
+        
+        .option-button {
+            display: block; /* Make the anchor fill the grid cell */
+            padding: 20px;
+            background-color: #8B4513;
+            color: #ffffff;
+            font-size: 18px;
+            text-decoration: none; /* Remove the underline from links */
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .option-button:hover, .option-button:focus {
+            background-color: #6e3510;
+            transform: scale(1.05);
+            outline: none; /* Remove focus outline for a cleaner look */
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to My Mobile Site!</h1>
-        <p>This is a simple mobile-friendly website using Bootstrap for responsiveness.</p>
-        <button class="btn btn-primary">Click Me</button>
+        <div class="header">
+            {% if page.header %}
+                <p class="description">{{ page.header }}</p>
+            {% endif %}
+            <h1 class="title">{{ page.title }}</h1>
+            <p class="description">{{ page.description }}</p>
+        </div>
+        <div class="options">
+            {% for option in options %}
+                <a href="{{ baseURL }}?id={{ option.id }}" class="option-button">{{ option.text }}</a>
+            {% endfor %}
+        </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
